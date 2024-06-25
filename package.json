@@ -1,0 +1,81 @@
+{
+  "name": "linkbot",
+  "version": "0.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "format": "prettier -w \"{src,tests}/**/*.{ts,tsx}\"",
+    "lint": "eslint \"{src,tests}/**/*.{ts,tsx}\"",
+    "test:unit": "vitest run --coverage",
+    "start:dev": "nodemon -r dotenv/config --inspect=9999 src/index.ts",
+    "version:patch": "fethca-version patch",
+    "version:minor": "fethca-version minor",
+    "version:major": "fethca-version major"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fethca/linkbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fethca/linkbot/issues"
+  },
+  "homepage": "https://github.com/fethca/linkbot#readme",
+  "dependencies": {
+    "@fethcat/logger": "^1.0.2",
+    "@fethcat/shared": "^0.0.16",
+    "@fethcat/validator": "^0.0.5",
+    "@vitest/coverage-v8": "^1.6.0",
+    "axios": "^1.7.2",
+    "domutils": "^3.1.0",
+    "dotenv": "^16.4.5",
+    "envalid": "^8.0.0",
+    "htmlparser2": "^9.1.0",
+    "openai": "^4.52.0",
+    "puppeteer": "^22.12.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-block-resources": "^2.4.3",
+    "puppeteer-extra-plugin-recaptcha": "^3.6.8",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "validator": "^13.12.0",
+    "vitest": "^1.6.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@fethcat/eslint-plugin": "^0.0.3",
+    "@fethcat/prettier-config": "^1.0.5",
+    "@fethcat/tests": "^0.0.15",
+    "@fethcat/version": "^0.0.12",
+    "@types/locate-chrome": "^0.1.2",
+    "@types/node": "^20.14.7",
+    "@types/validator": "^13.12.0",
+    "mockdate": "^3.0.5",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.2",
+    "puppeteer-extra-plugin": "^3.2.3",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.2"
+  },
+  "prettier": "@fethcat/prettier-config",
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      ".git",
+      "node_modules/**/node_modules"
+    ],
+    "execMap": {
+      "ts": "tsx"
+    },
+    "watch": [
+      "src/"
+    ],
+    "ext": "js,json,ts"
+  },
+  "eslintConfig": {
+    "extends": [
+      "plugin:@fethcat/back"
+    ]
+  }
+}
