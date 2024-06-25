@@ -14,9 +14,6 @@ importers:
       '@fethcat/shared':
         specifier: ^0.0.16
         version: 0.0.16(@types/node@20.14.7)(socks@2.8.3)(vitest@1.6.0(@types/node@20.14.7))
-      '@fethcat/store':
-        specifier: ^0.0.2
-        version: 0.0.2(@types/node@20.14.7)
       '@fethcat/validator':
         specifier: ^0.0.5
         version: 0.0.5(@types/node@20.14.7)(envalid@8.0.0)
@@ -359,10 +356,6 @@ packages:
 
   '@fethcat/shared@0.0.3':
     resolution: {integrity: sha512-NF5+NgEKcNOG5Ay+vuqyK5iZRBO151DUei4/o1LO1JfH8/aTVV7yY7MngHTjKRFj9olU27WxPEP2WVNU4jWcfw==}
-
-  '@fethcat/store@0.0.2':
-    resolution: {integrity: sha512-bz30f4Y4qE23gDVPTRRiF7M4s1bEZq0VF3AJflqhOwRVvN3poe4EYnBho5ZmtWKaimclzxJikLUN7GczHe4Epg==}
-    hasBin: true
 
   '@fethcat/tests@0.0.15':
     resolution: {integrity: sha512-vfKAEY2YXNu9mq8y4HGKH9x7NlNYAg/vVLjByoAc6LMZSQd1OCiRLoSxm4MxkTpMJ9PoAlncLBYUqMIRQw255w==}
@@ -3030,26 +3023,6 @@ snapshots:
   '@fethcat/shared@0.0.3':
     dependencies:
       zod: 3.23.8
-
-  '@fethcat/store@0.0.2(@types/node@20.14.7)':
-    dependencies:
-      '@vitest/coverage-v8': 1.6.0(vitest@1.6.0(@types/node@20.14.7))
-      ioredis: 5.4.1
-      vitest: 1.6.0(@types/node@20.14.7)
-    transitivePeerDependencies:
-      - '@edge-runtime/vm'
-      - '@types/node'
-      - '@vitest/browser'
-      - '@vitest/ui'
-      - happy-dom
-      - jsdom
-      - less
-      - lightningcss
-      - sass
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
 
   '@fethcat/tests@0.0.15(@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.14.7)))(vitest@1.6.0(@types/node@20.14.7))':
     dependencies:
