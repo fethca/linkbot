@@ -1,0 +1,52 @@
+import { extractPackageJson } from '@fethcat/shared/helpers'
+import { logsValidators, validateEnv } from '@fethcat/validator'
+import { randomBytes } from 'crypto'
+import { num, str } from 'envalid'
+
+const { name, version } = extractPackageJson()
+
+const env = validateEnv({
+  ...logsValidators,
+  PORT: num({ default: 3000 }),
+  LINKEDIN_PWD: str(),
+  LINKEDIN_USER: str(),
+  OPENAI_API_KEY: str(),
+  REFRESH_INTERVAL: num({ default: 1000 * 60 }),
+  REFRESH_OFFSET: num({ default: 1000 * 15 }),
+})
+
+const instanceId = randomBytes(16).toString('hex')
+
+export const settings = {
+  instanceId,
+  metadata: { app: name, version, port: env.PORT, env: env.APP_STAGE },
+  logs: {
+    silent: env.LOG_SILENT,
+  },
+  linkedin: {
+    password: env.LINKEDIN_PWD,
+    username: env.LINKEDIN_USER,
+  },
+  openAi: {
+    key: env.OPENAI_API_KEY,
+  },
+  refresh: { interval: env.REFRESH_INTERVAL, offset: env.REFRESH_OFFSET },
+}
+
+const messages = [
+  'main_job',
+  'linkedin_job',
+  'linkedin_login',
+  'linkedin_extract',
+  'linkedin_answer',
+  'open_ai_interpret',
+  'puppeteer_browser_disconnected',
+  'puppeteer_create_page',
+  'puppeteer_init',
+  'puppeteer_reset_browser',
+  'puppeteer_run_browser',
+  'puppeteer_stop_browser',
+  'puppeteer_user_agent',
+] as const
+
+export type Message = (typeof messages)[number]
