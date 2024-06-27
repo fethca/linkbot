@@ -11,6 +11,7 @@ const env = validateEnv({
   LINKEDIN_PWD: str(),
   LINKEDIN_USER: str(),
   OPENAI_API_KEY: str(),
+  LINKEDIN_ERROR_PATH: str({ default: '/usr/app/linkbot-errors/last_error_screenshot.png' }),
   REFRESH_INTERVAL: num({ default: 1000 * 60 }),
   REFRESH_OFFSET: num({ default: 1000 * 15 }),
 })
@@ -26,6 +27,7 @@ export const settings = {
   linkedin: {
     password: env.LINKEDIN_PWD,
     username: env.LINKEDIN_USER,
+    errorPath: env.LINKEDIN_ERROR_PATH,
   },
   openAi: {
     key: env.OPENAI_API_KEY,
