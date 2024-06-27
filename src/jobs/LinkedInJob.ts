@@ -1,8 +1,6 @@
 import { ILogger, Logger } from '@fethcat/logger'
-import { Page } from 'puppeteer'
 import { extractId, getAnswer, getPrompt } from '../helpers/utils.js'
-import { PuppeteerManager } from '../modules/puppeteer.js'
-import { openai } from '../services/services.js'
+import { openai, puppeteer } from '../services/services.js'
 import { Message, settings } from '../settings.js'
 import { IGPT, gptSchemas } from '../types.js'
 
@@ -12,25 +10,23 @@ type IMessage = { message: string; id: string }
 
 export class LinkedInJob {
   protected logger: ILogger<Message> = Logger.create<Message>(instanceId, logs, metadata)
-  private puppeteer = new PuppeteerManager()
-  private page: Page | undefined
 
   async run() {
     const { success, failure } = this.logger.action('linkedin_job')
     try {
       // await wait(2000)
-      await this.puppeteer.init()
+      await puppeteer.init()
       await this.login()
 
       const messages = await this.extract()
 
       for (const message of messages) await this.processMessage(message)
 
-      await this.puppeteer.destroy()
+      await puppeteer.destroy()
       success()
     } catch (error) {
-      if (this.page) await this.page.screenshot({ path: settings.linkedin.errorPath })
-      await this.puppeteer.destroy()
+      if (puppeteer.currentPage) await puppeteer.currentPage.screenshot({ path: settings.linkedin.errorPath })
+      await puppeteer.destroy()
       throw failure(error)
     }
   }
@@ -39,11 +35,14 @@ export class LinkedInJob {
     const { success, failure } = this.logger.action('linkedin_login')
     try {
       const link = 'https://www.linkedin.com/login/fr?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin'
-      this.page = await this.puppeteer.createPage(link)
-      await this.page.type('#username', settings.linkedin.username)
-      await this.page.type('#password', settings.linkedin.password)
-      await this.page.click('button[data-litms-control-urn="login-submit"]')
-      await this.page.waitForNavigation()
+      await puppeteer.createPage(link)
+
+      if (!puppeteer.currentPage) throw "Something went wrong, page doesn't exist"
+
+      await puppeteer.currentPage.type('#username', settings.linkedin.username)
+      await puppeteer.currentPage.type('#password', settings.linkedin.password)
+      await puppeteer.currentPage.click('button[data-litms-control-urn="login-submit"]')
+      await puppeteer.currentPage.waitForNavigation()
       success()
     } catch (error) {
       throw failure(error)
@@ -53,35 +52,37 @@ export class LinkedInJob {
   async extract(): Promise<IMessage[]> {
     const { success, failure, skip } = this.logger.action('linkedin_extract')
     try {
-      if (!this.page) throw "Something went wrong, page doesn't exist"
+      if (!puppeteer.currentPage) throw "Something went wrong, page doesn't exist"
 
-      await this.page.goto('https://www.linkedin.com/messaging/?filter=unread')
+      await puppeteer.currentPage.goto('https://www.linkedin.com/messaging/?filter=unread')
 
       await Promise.race([
-        this.page.waitForSelector('.msg-conversations-container__convo-item-link'),
-        this.page.waitForSelector('text="Aucun message"'),
+        puppeteer.currentPage.waitForSelector('.msg-conversations-container__convo-item-link'),
+        puppeteer.currentPage.waitForSelector('text="Aucun message"'),
       ])
 
-      if (await this.page.$('text="Aucun message"')) {
+      if (await puppeteer.currentPage.$('text="Aucun message"')) {
         skip('no_messages')
         return []
       }
 
-      await this.page.waitForSelector('.msg-conversations-container__convo-item-link')
+      await puppeteer.currentPage.waitForSelector('.msg-conversations-container__convo-item-link')
 
-      const links = await this.page.$$eval('.msg-conversations-container__convo-item-link', (conversations) =>
-        conversations.map((conversation) => {
-          if (conversation instanceof HTMLAnchorElement) return conversation.href
-        }),
+      const links = await puppeteer.currentPage.$$eval(
+        '.msg-conversations-container__convo-item-link',
+        (conversations) =>
+          conversations.map((conversation) => {
+            if (conversation instanceof HTMLAnchorElement) return conversation.href
+          }),
       )
 
       const threadIds = links.map((link) => extractId(link)).filter(Boolean)
 
       const messages: IMessage[] = []
       for (const id of threadIds) {
-        await this.page.goto(`https://www.linkedin.com/messaging/thread/${id}/?filter=unread`)
-        await this.page.waitForSelector('.msg-s-event-listitem__body')
-        const message = await this.page.$eval('.msg-s-event-listitem__body', (el) => el.textContent)
+        await puppeteer.currentPage.goto(`https://www.linkedin.com/messaging/thread/${id}/?filter=unread`)
+        await puppeteer.currentPage.waitForSelector('.msg-s-event-listitem__body')
+        const message = await puppeteer.currentPage.$eval('.msg-s-event-listitem__body', (el) => el.textContent)
         if (message && id) messages.push({ message, id })
       }
 
@@ -127,11 +128,11 @@ export class LinkedInJob {
   async answer(message: IMessage, firstName: string) {
     const { success, failure } = this.logger.action('linkedin_answer')
     try {
-      if (!this.page) throw "Something went wrong, page doesn't exist"
-      await this.page.goto(`https://www.linkedin.com/messaging/thread/${message.id}`)
-      await this.page.waitForSelector('.msg-form__contenteditable')
-      await this.page.type('.msg-form__contenteditable', getAnswer(firstName))
-      await this.page.click('.msg-form__send-button')
+      if (!puppeteer.currentPage) throw "Something went wrong, page doesn't exist"
+      await puppeteer.currentPage.goto(`https://www.linkedin.com/messaging/thread/${message.id}`)
+      await puppeteer.currentPage.waitForSelector('.msg-form__contenteditable')
+      await puppeteer.currentPage.type('.msg-form__contenteditable', getAnswer(firstName))
+      await puppeteer.currentPage.click('.msg-form__send-button')
       success()
     } catch (error) {
       throw failure(error)
