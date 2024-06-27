@@ -1,5 +1,5 @@
 import { ILogger, Logger } from '@fethcat/logger'
-import { extractId, getAnswer, getPrompt } from '../helpers/utils.js'
+import { click, extractId, findText, getAnswer, getPrompt, wrap } from '../helpers/utils.js'
 import { openai, puppeteer } from '../services/services.js'
 import { Message, settings } from '../settings.js'
 import { IGPT, gptSchemas } from '../types.js'
@@ -42,7 +42,14 @@ export class LinkedInJob {
       await puppeteer.currentPage.type('#username', settings.linkedin.username)
       await puppeteer.currentPage.type('#password', settings.linkedin.password)
       await puppeteer.currentPage.click('button[data-litms-control-urn="login-submit"]')
-      await puppeteer.currentPage.waitForNavigation()
+      await puppeteer.currentPage.waitForNetworkIdle()
+
+      const timeout = 5000
+      const resend = await wrap(puppeteer.currentPage.waitForSelector(findText('Envoyer à nouveau'), { timeout }))
+      if (resend) await resend?.evaluate(click)
+
+      await puppeteer.currentPage.waitForNetworkIdle()
+
       success()
     } catch (error) {
       throw failure(error)
