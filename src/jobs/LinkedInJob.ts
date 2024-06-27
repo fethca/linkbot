@@ -29,7 +29,7 @@ export class LinkedInJob {
       await this.puppeteer.destroy()
       success()
     } catch (error) {
-      if (this.page) await this.page.screenshot({ path: 'last_error_screenshot.png' })
+      if (this.page) await this.page.screenshot({ path: settings.linkedin.errorPath })
       await this.puppeteer.destroy()
       throw failure(error)
     }

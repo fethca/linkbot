@@ -67,6 +67,7 @@ RUN apt-get update \
 COPY --from=source --chown=node:node /usr/app/package.json /usr/app/package.json
 COPY --from=dependencies --chown=node:node /usr/app/node_modules/ /usr/app/node_modules/
 COPY --from=build --chown=node:node /usr/app/dist/ /usr/app/dist/
+RUN mkdir -p /usr/app/linkbot-errors && chown -R node:node /usr/app/linkbot-errors
 
 USER node
 

@@ -11,10 +11,10 @@ describe('run', () => {
     return app
   }
 
-  it('should log success', async () => {
+  it('should log success', () => {
     const app = createApp()
     const { success } = mockAction(app['logger'])
-    await app.run()
+    app.run()
     expect(success).toHaveBeenCalled()
   })
 })
