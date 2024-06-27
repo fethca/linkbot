@@ -93,7 +93,7 @@ export class PuppeteerManager implements IPuppeteerManager {
 
       const browser = await puppeteer.default.launch({
         executablePath: this.chromePath,
-        headless: false,
+        headless: true,
         devtools: false,
         ignoreHTTPSErrors: true,
         slowMo: 0,
