@@ -1,5 +1,6 @@
 import { Logger } from '@fethcat/logger'
 import { MainJob } from './jobs/MainJob.js'
+import { puppeteer } from './services/services.js'
 import { Message, settings } from './settings.js'
 
 const { instanceId, logs, metadata } = settings
@@ -19,7 +20,8 @@ export class App {
     }
   }
 
-  private exit() {
+  private async exit() {
     this.logger.info('app_stop')
+    await puppeteer.destroy()
   }
 }
