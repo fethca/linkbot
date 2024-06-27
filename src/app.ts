@@ -21,7 +21,12 @@ export class App {
   }
 
   private async exit() {
-    this.logger.info('app_stop')
-    await puppeteer.destroy()
+    const { success, failure } = this.logger.action('app_stop')
+    try {
+      await puppeteer.destroy()
+      success()
+    } catch (error) {
+      failure(error)
+    }
   }
 }

@@ -192,6 +192,7 @@ export class PuppeteerManager implements IPuppeteerManager {
       if (this.currentPage) {
         this.logger.info('puppeteer_screenshot')
         await this.currentPage.screenshot({ path: settings.linkedin.errorPath })
+        this.logger.info('puppeteer_screenshot_success')
       }
       this.isReleased = true
       this.userAgents = []
