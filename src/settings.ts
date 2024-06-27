@@ -48,6 +48,7 @@ const messages = [
   'puppeteer_reset_browser',
   'puppeteer_run_browser',
   'puppeteer_screenshot',
+  'puppeteer_screenshot_success',
   'puppeteer_stop_browser',
   'puppeteer_user_agent',
 ] as const
