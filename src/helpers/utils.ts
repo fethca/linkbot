@@ -1,3 +1,5 @@
+import { ElementHandle } from 'puppeteer'
+
 export function extractId(href: string | undefined): string | undefined {
   if (!href) return
   const match = href.match(/thread\/([^/?]+)/)
@@ -57,4 +59,18 @@ Jérémy
 
 export const unwantedUA = (value: string) => {
   return !value.includes('Safari/537.3') && !value.includes('Windows NT 6.1')
+}
+
+export function findText(text: string) {
+  return `::-p-xpath(//*[contains(text(), '${text}')])`
+}
+
+export function click(element: unknown) {
+  if (element instanceof HTMLElement) {
+    element.click()
+  }
+}
+
+export function wrap(func: Promise<ElementHandle<Element> | null>): Promise<ElementHandle<Element> | null> {
+  return func.then((el) => el).catch(() => null)
 }
