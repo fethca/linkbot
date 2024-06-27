@@ -42,6 +42,7 @@ export class PuppeteerManager implements IPuppeteerManager {
   userAgents: string[] = []
   browser?: Browser
   chromePath: string = ''
+  currentPage: Page | undefined
 
   async init() {
     const { success, failure } = this.logger.action('puppeteer_init')
@@ -120,8 +121,8 @@ export class PuppeteerManager implements IPuppeteerManager {
     try {
       if (!this.browser) throw new Error("couldn't run browser")
       const userAgent = await this.getRandomUA()
-      const page = await this.browser.newPage()
-      await page.setViewport({
+      this.currentPage = await this.browser.newPage()
+      await this.currentPage.setViewport({
         width: 1920 + Math.floor(Math.random() * 100),
         height: 3000 + Math.floor(Math.random() * 100),
         deviceScaleFactor: 1,
@@ -133,25 +134,25 @@ export class PuppeteerManager implements IPuppeteerManager {
       //Cloudflare bypass techniques currently doesn't work with puppeteer
       //so the below overrides won't help much.
       //Use Flaresolverr instead before an eventual fix
-      await page.setUserAgent(userAgent)
-      await page.setJavaScriptEnabled(true)
-      page.setDefaultNavigationTimeout(0)
+      await this.currentPage.setUserAgent(userAgent)
+      await this.currentPage.setJavaScriptEnabled(true)
+      this.currentPage.setDefaultNavigationTimeout(0)
 
-      await page.evaluateOnNewDocument(() => {
+      await this.currentPage.evaluateOnNewDocument(() => {
         Object.defineProperty(navigator, 'webdriver', { get: () => false })
       })
 
-      await page.evaluateOnNewDocument(() => {
+      await this.currentPage.evaluateOnNewDocument(() => {
         Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3, 4, 5] })
       })
 
-      await page.evaluateOnNewDocument(() => {
+      await this.currentPage.evaluateOnNewDocument(() => {
         Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] })
       })
 
-      await page.goto(url)
+      await this.currentPage.goto(url)
       success()
-      return page
+      return this.currentPage
     } catch (error) {
       throw failure(error)
     }
@@ -188,6 +189,7 @@ export class PuppeteerManager implements IPuppeteerManager {
   async destroy() {
     const { success, failure } = this.logger.action('puppeteer_stop_browser')
     try {
+      if (this.currentPage) await this.currentPage.screenshot({ path: settings.linkedin.errorPath })
       this.isReleased = true
       this.userAgents = []
       if (this.browser) await this.browser.close()
