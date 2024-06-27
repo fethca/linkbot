@@ -36,17 +36,18 @@ export const settings = {
 }
 
 const messages = [
-  'main_job',
+  'linkedin_answer',
+  'linkedin_extract',
   'linkedin_job',
   'linkedin_login',
-  'linkedin_extract',
-  'linkedin_answer',
+  'main_job',
   'open_ai_interpret',
   'puppeteer_browser_disconnected',
   'puppeteer_create_page',
   'puppeteer_init',
   'puppeteer_reset_browser',
   'puppeteer_run_browser',
+  'puppeteer_screenshot',
   'puppeteer_stop_browser',
   'puppeteer_user_agent',
 ] as const

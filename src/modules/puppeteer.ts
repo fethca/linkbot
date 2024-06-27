@@ -189,7 +189,10 @@ export class PuppeteerManager implements IPuppeteerManager {
   async destroy() {
     const { success, failure } = this.logger.action('puppeteer_stop_browser')
     try {
-      if (this.currentPage) await this.currentPage.screenshot({ path: settings.linkedin.errorPath })
+      if (this.currentPage) {
+        this.logger.info('puppeteer_screenshot')
+        await this.currentPage.screenshot({ path: settings.linkedin.errorPath })
+      }
       this.isReleased = true
       this.userAgents = []
       if (this.browser) await this.browser.close()
