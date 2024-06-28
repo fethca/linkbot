@@ -120,8 +120,7 @@ export class PuppeteerManager implements IPuppeteerManager {
     const { success, failure } = this.logger.action('puppeteer_create_page')
     try {
       if (!this.browser) throw new Error("couldn't run browser")
-      const userAgent = await this.getRandomUA()
-      this.currentPage = await this.browser.newPage()
+      if (!this.currentPage) this.currentPage = await this.browser.newPage()
       await this.currentPage.setViewport({
         width: 1920 + Math.floor(Math.random() * 100),
         height: 3000 + Math.floor(Math.random() * 100),
@@ -134,6 +133,7 @@ export class PuppeteerManager implements IPuppeteerManager {
       //Cloudflare bypass techniques currently doesn't work with puppeteer
       //so the below overrides won't help much.
       //Use Flaresolverr instead before an eventual fix
+      const userAgent = await this.getRandomUA()
       await this.currentPage.setUserAgent(userAgent)
       await this.currentPage.setJavaScriptEnabled(true)
       this.currentPage.setDefaultNavigationTimeout(0)
@@ -189,11 +189,6 @@ export class PuppeteerManager implements IPuppeteerManager {
   async destroy() {
     const { success, failure } = this.logger.action('puppeteer_stop_browser')
     try {
-      if (this.currentPage) {
-        this.logger.info('puppeteer_screenshot')
-        await this.currentPage.screenshot({ path: settings.linkedin.errorPath })
-        this.logger.info('puppeteer_screenshot_success')
-      }
       this.isReleased = true
       this.userAgents = []
       if (this.browser) await this.browser.close()
